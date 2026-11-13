@@ -2,6 +2,8 @@
 # Resumo do projeto
 
   
+> 📚 Repositório de estudo baseado no projeto do curso **Integração Contínua: Rollback e teste de carga**, da [Alura](https://www.alura.com.br).
+> Infraestrutura usada pela API do repositório [api-go-cicd-aws-ecs](https://github.com/EnzoDiasDev/api-go-cicd-aws-ecs).
 
 Projeto de Infraestrutura como código para auxiliar o Curso de testes de carga de CI/CD
 
