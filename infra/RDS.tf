@@ -1,5 +1,5 @@
 resource "aws_db_instance" "default" {
-  allocated_storage    = 10
+  allocated_storage    = 20 # mínimo aceito pelo RDS PostgreSQL (10 é recusado)
   db_name              = "root"
   engine               = "postgres"
   instance_class       = "db.t3.micro"

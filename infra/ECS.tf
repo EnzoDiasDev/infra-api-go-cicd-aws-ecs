@@ -1,12 +1,14 @@
 module "ecs" {
-  source = "terraform-aws-modules/ecs/aws"
+  source  = "terraform-aws-modules/ecs/aws"
+  version = "~> 6.0"
 
-  cluster_name       = var.ambiante
-  fargate_capacity_providers = {
+  cluster_name = var.ambiante
+
+  # Na v6 do módulo, "fargate_capacity_providers" foi substituído por
+  # "default_capacity_provider_strategy" (mesmo efeito: cluster usando FARGATE).
+  default_capacity_provider_strategy = {
     FARGATE = {
-      default_capacity_provider_strategy = {
-        weight = 100
-      }
+      weight = 100
     }
   }
 }
@@ -85,4 +87,9 @@ resource "aws_ecs_service" "Go-API" {
       capacity_provider = "FARGATE"
       weight = 1 #100/100
   }
+
+  # O target group só pode ser usado por um serviço depois de estar ligado
+  # ao load balancer (via listener). Sem isso, o apply pode falhar com
+  # "target group does not have an associated load balancer".
+  depends_on = [aws_lb_listener.http]
 }
