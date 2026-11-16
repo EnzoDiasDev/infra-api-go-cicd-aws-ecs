@@ -13,6 +13,11 @@ module "ecs" {
   }
 }
 
+resource "aws_cloudwatch_log_group" "api" {
+  name              = "/ecs/${var.ambiante}/Go-API"
+  retention_in_days = 1 # ambiente efêmero: os logs só precisam viver o tempo do teste
+}
+
 resource "aws_ecs_task_definition" "Go-API" {
   family                   = "Go-API"
   requires_compatibilities = ["FARGATE"]
@@ -28,6 +33,15 @@ resource "aws_ecs_task_definition" "Go-API" {
         "cpu"       = 256
         "memory"    = 512
         "essential" = true
+        # Envia os logs da API para o CloudWatch (sem isto, não há onde ler os erros)
+        "logConfiguration" = {
+          "logDriver" = "awslogs"
+          "options" = {
+            "awslogs-group"         = aws_cloudwatch_log_group.api.name
+            "awslogs-region"        = "us-east-1"
+            "awslogs-stream-prefix" = "homolog"
+          }
+        }
         "portMappings" = [
           {
             "containerPort" = 8000
