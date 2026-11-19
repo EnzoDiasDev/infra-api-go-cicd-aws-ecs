@@ -36,6 +36,26 @@ resource "aws_iam_role_policy" "ecs_ecr" {
   })
 }
 
+# Permite que o ECS leia, só estes dois segredos, ao iniciar a tarefa.
+resource "aws_iam_role_policy" "ler_segredos" {
+  name = "ler_segredos_api_go"
+  role = aws_iam_role.cargo.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = ["secretsmanager:GetSecretValue"]
+        Effect = "Allow"
+        Resource = [
+          aws_secretsmanager_secret.db.arn,
+          aws_secretsmanager_secret.api_keys.arn,
+        ]
+      },
+    ]
+  })
+}
+
 resource "aws_iam_instance_profile" "perfil" {
   name = "${var.cargoIAM}_perfil"
   role = aws_iam_role.cargo.name

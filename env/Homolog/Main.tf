@@ -15,3 +15,13 @@ module "homolog" {
 output "IP_alb" {
   value = module.homolog.IP
 }
+
+# ARN dos segredos no Secrets Manager. Para ler a chave de API, por exemplo:
+# aws secretsmanager get-secret-value --secret-id <api_keys_secret_arn>
+output "db_secret_arn" {
+  value = module.homolog.db_secret_arn
+}
+
+output "api_keys_secret_arn" {
+  value = module.homolog.api_keys_secret_arn
+}
