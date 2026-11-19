@@ -62,16 +62,29 @@ resource "aws_ecs_task_definition" "Go-API" {
             "value" = tostring(aws_db_instance.default.username)
           },
           {
-            "name"  = "PASSWORD"
-            "value" = "rootroot"
-          },
-          {
             "name"  = "DBNAME"
             "value" = "root"
           },
           {
             "name"  = "PORT"
             "value" = "8000"
+          }
+        ]
+        # Valores sensíveis vêm do Secrets Manager (Segredos.tf). O ECS lê o
+        # segredo ao iniciar a tarefa; o formato "<arn>:<chave-json>::" pega
+        # só um campo do JSON guardado no segredo.
+        "secrets" = [
+          {
+            "name"      = "PASSWORD"
+            "valueFrom" = "${aws_secretsmanager_secret.db.arn}:password::"
+          },
+          {
+            "name"      = "API_KEY_LEITURA"
+            "valueFrom" = "${aws_secretsmanager_secret.api_keys.arn}:API_KEY_LEITURA::"
+          },
+          {
+            "name"      = "API_KEY_ADMIN"
+            "valueFrom" = "${aws_secretsmanager_secret.api_keys.arn}:API_KEY_ADMIN::"
           }
         ]
       }
@@ -105,5 +118,11 @@ resource "aws_ecs_service" "Go-API" {
   # O target group só pode ser usado por um serviço depois de estar ligado
   # ao load balancer (via listener). Sem isso, o apply pode falhar com
   # "target group does not have an associated load balancer".
-  depends_on = [aws_lb_listener.http]
+  # Os segredos precisam ter um valor gravado antes de a primeira tarefa subir;
+  # senão o ECS não consegue ler PASSWORD e as chaves de API.
+  depends_on = [
+    aws_lb_listener.http,
+    aws_secretsmanager_secret_version.db,
+    aws_secretsmanager_secret_version.api_keys,
+  ]
 }

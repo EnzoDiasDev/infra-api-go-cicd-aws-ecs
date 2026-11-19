@@ -1,0 +1,5 @@
+# Exceções aceitas na varredura de IaC (Trivy) que não dá para marcar com
+# comentário no próprio arquivo. As exceções do Terraform ficam junto do
+# recurso, em comentários "#trivy:ignore:<ID>" com a justificativa.
+
+misconfigurations: []
